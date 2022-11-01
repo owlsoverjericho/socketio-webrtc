@@ -13,9 +13,8 @@ const io = new Server(HTTPserver, {
     transports: ["websocket"],
 });
 
-io.on("connection", (socket) => {
-    console.log(`${socket.id} has connected`);
 
+io.on("connection", (socket) => {
     socket.on(ACTIONS.JOIN, (data) => {
         socket.join(data.roomID);
     })
@@ -28,4 +27,4 @@ io.on("connection", (socket) => {
      })
 })
 
-HTTPserver.listen(PORT, console.log(`HTTP server is running on port ${PORT}`));
+HTTPserver.listen(PORT, console.log(`HTTP server is running on port ${PORT} 🚀`));
