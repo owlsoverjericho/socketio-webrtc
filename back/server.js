@@ -17,7 +17,20 @@ io.on("connection", (socket) => {
     console.log(`${socket.id} has connected`);
 
     socket.on(ACTIONS.JOIN, (data) => {
-        socket.join(data.roomID);
+        console.log("create or join a room");
+        const myRoom = io.sockets.adapter.rooms.get(data.roomID) || { length: 0 };
+        console.log(myRoom)
+/*         const numClients = myRoom.length;
+        if(numClients === 0) {
+            socket.join(data.roomID);
+            socket.emit("created", data.roomID);
+        } else if (numClients === 1) {
+            socket.join(data.roomID);
+            socket.emit("joined", data.roomID);
+        } else {
+            socket.emit("full", data.roomID)
+        }
+        console.log(`${data.roomID} has ${numClients} clients`) */
     })
 
     socket.on('connect_failed', (e) => {
