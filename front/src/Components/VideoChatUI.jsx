@@ -1,17 +1,19 @@
 import { useEffect, useRef } from "react";
-
+import socket from "../Socket/";
+import { useNavigate } from "react-router-dom"; 
 
 
 const VideoChatUI = () => {
   const localVideoRef = useRef();
   const remoteVideoRef = useRef();
-
+  
+  const navigate = useNavigate();
+  
   useEffect(() => async () => {
-    let stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: false,
+    socket.on("full", () => {
+      console.log("full room")
+      navigate("/")
     });
-    localVideoRef.current.srcObject = stream;
   });
 
   return (
