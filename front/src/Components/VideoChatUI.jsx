@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import socket from "../Socket/";
 import { useNavigate, useParams } from "react-router-dom";
+import { Grid, GridItem, AspectRatio, Center } from "@chakra-ui/react";
 
 const VideoChatUI = () => {
   const localVideoRef = useRef();
@@ -11,7 +12,10 @@ const VideoChatUI = () => {
   const networkConfig = {
     iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
   };
-  const mediaConfig = { video: true, audio: false };
+  const mediaConfig = {
+    video: true,
+    audio: false,
+  };
   const stream = useRef();
   const remoteStream = useRef();
   const offer = useRef();
@@ -19,25 +23,23 @@ const VideoChatUI = () => {
 
   const navigate = useNavigate();
 
-
   const onAddStream = (event) => {
     remoteVideoRef.current.srcObject = event.streams[0];
     remoteStream.current = event.streams[0];
-  }
+  };
 
   const onIceCandidate = (event) => {
-    if(event.candidate) {
+    if (event.candidate) {
       console.log(`sending an ICE candidate ${event.candidate}`);
-      socket.emit("candidate", { 
+      socket.emit("candidate", {
         type: "candidate",
         label: event.candidate.sdpMLineIndex,
         id: event.candidate.sdpMid,
         candidate: event.candidate.candidate,
         roomID: roomID,
-       })
+      });
     }
-  }
-
+  };
 
   useEffect(() => async () => {
     socket.on("created", async () => {
@@ -69,9 +71,9 @@ const VideoChatUI = () => {
           peerConnection.current = new RTCPeerConnection(networkConfig);
           peerConnection.current.onicecandidate = onIceCandidate;
           peerConnection.current.ontrack = onAddStream;
-          stream.current.getTracks().forEach(track => {
-            peerConnection.current.addTrack(track, stream.current)
-          })
+          stream.current.getTracks().forEach((track) => {
+            peerConnection.current.addTrack(track, stream.current);
+          });
 
           offer.current = await peerConnection.current.createOffer();
           peerConnection.current.setLocalDescription(offer.current);
@@ -86,8 +88,6 @@ const VideoChatUI = () => {
       }
     });
 
-
-
     socket.on("offer", async (event) => {
       console.log(`Event offer was triggered`);
       if (!isCaller.current) {
@@ -95,11 +95,13 @@ const VideoChatUI = () => {
           peerConnection.current = new RTCPeerConnection(networkConfig);
           peerConnection.current.onicecandidate = onIceCandidate;
           peerConnection.current.ontrack = onAddStream;
-          stream.current.getTracks().forEach(track => {
-            peerConnection.current.addTrack(track, stream.current)
-          })
-          
-          peerConnection.current.setRemoteDescription(new RTCSessionDescription(event));
+          stream.current.getTracks().forEach((track) => {
+            peerConnection.current.addTrack(track, stream.current);
+          });
+
+          peerConnection.current.setRemoteDescription(
+            new RTCSessionDescription(event)
+          );
           answer.current = await peerConnection.current.createAnswer();
           peerConnection.current.setLocalDescription(answer.current);
           socket.emit("answer", {
@@ -113,24 +115,21 @@ const VideoChatUI = () => {
       }
     });
 
-
-
-
     socket.on("answer", (event) => {
       console.log(`Event answer was triggered`);
-      peerConnection.current.setRemoteDescription(new RTCSessionDescription(event));
-    })
-
+      peerConnection.current.setRemoteDescription(
+        new RTCSessionDescription(event)
+      );
+    });
 
     socket.on("candidate", (event) => {
       console.log(`Event candidate was triggered`);
       const candidate = new RTCIceCandidate({
         sdpMLineIndex: event.label,
-        candidate: event.candidate
-      })
+        candidate: event.candidate,
+      });
       peerConnection.current.addIceCandidate(candidate);
-    })
-
+    });
 
     socket.on("full", () => {
       console.log("full room");
@@ -140,18 +139,27 @@ const VideoChatUI = () => {
 
   return (
     <>
-      <div className="grid w-3/5">
-        <video
-          ref={localVideoRef}
-          className="object-contain w-full h-full"
-          autoPlay
-        ></video>
-        <video
-          ref={remoteVideoRef}
-          className="object-contain w-full h-full"
-          autoPlay
-        ></video>
-      </div>
+      <Grid
+        templateAreas={`"localVideoOutput"
+                        "romoteVideoOutput"`}
+        gridTemplateRows={"1fr 1fr"}
+        gridTemplateColumns={"1fr"}
+        h="100%"
+        gap="1"
+        color="blackAlpha.700"
+        fontWeight="bold"
+      >
+        <GridItem pl="2" area={"localVideoOutput"}>
+          <AspectRatio ratio={16 / 9}>
+            <video ref={localVideoRef} autoPlay playsInline></video>
+          </AspectRatio>
+        </GridItem>
+        <GridItem pl="2" area={"romoteVideoOutput"}>
+          <AspectRatio ratio={16 / 9}>
+            <video ref={remoteVideoRef} autoPlay playsInline></video>
+          </AspectRatio>
+        </GridItem>
+      </Grid>
     </>
   );
 };

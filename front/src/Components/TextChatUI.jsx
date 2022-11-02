@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import socket from "../Socket";
 import ACTIONS from "../Socket/actions.mjs";
+import { Button, Input, Flex, Text, Avatar } from "@chakra-ui/react";
 
 const TextChatUI = () => {
   const [messages, setMessages] = useState([]);
@@ -24,37 +25,43 @@ const TextChatUI = () => {
     if (myID === data.userID) {
       return (
         <>
-          {/* message FROM me */}
-          <div className="flex w-full mt-2 space-x-3 max-w-xs ml-auto justify-end">
-            <div>
-              <div className="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">
-                <p className="text-sm">{data.message}</p>
-              </div>
-              <span className="text-xs text-gray-500 leading-none">
-                {new Date().toISOString()}
-              </span>
-            </div>
-            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
-          </div>
+          <Flex key={index} w="100%" justify="flex-end">
+            <Flex
+              bg="blue"
+              color="white"
+              minW="100px"
+              maxW="350px"
+              my="1"
+              p="3"
+            >
+              <Text>{data.message}</Text>
+            </Flex>
+            <Avatar
+            name="localUser"
+            bg="blue.300"
+          ></Avatar>
+          </Flex>
         </>
       );
     }
     return (
       <>
-        {/* a message TO me */}
-        <li key={index}>
-          <div className="flex w-full mt-2 space-x-3 max-w-xs">
-            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"></div>
-            <div>
-              <div className="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
-                <p className="text-sm">{data.message}</p>
-              </div>
-              <span className="text-xs text-gray-500 leading-none">
-                {new Date().toISOString()}
-              </span>
-            </div>
-          </div>
-        </li>
+        <Flex key={index} w="100%">
+          <Avatar
+            name="remoteUser"
+            bg="blue.300"
+          ></Avatar>
+          <Flex
+            bg="gray.100"
+            color="black"
+            minW="100px"
+            maxW="350px"
+            my="1"
+            p="3"
+          >
+            <Text>{data.message}</Text>
+          </Flex>
+        </Flex>
       </>
     );
   });
@@ -72,26 +79,40 @@ const TextChatUI = () => {
 
   return (
     <>
-      <div className="flex grow justify-end bg-yellow-100 text-gray-800">
-        {/* the chatbox */}
-        <div className="flex flex-col w-full bg-white shadow-xl rounded-lg">
-          <div className="flex flex-col flex-grow h-screen p-4 overflow-auto">
-            <ul>{messageList}</ul>
-          </div>
-          {/* enter message box */}
-          <div className="bg-gray-300 p-4 flex">
-            <input
-              ref={messageTextRef}
-              className="flex items-center h-10 w-full rounded px-3 text-sm"
-              type="text"
-              placeholder="Type your message…"
-            />
-            <button onClick={sendMessage} className="btn w-5 h-3 mt-0 m-2">
-              Send
-            </button>
-          </div>
-        </div>
-      </div>
+      <Flex w="100%" h="95%" overflowY="scroll" flexDirection="column" p="3">
+        <ul>{messageList}</ul>
+      </Flex>
+
+      <Flex w="100%" mt-5>
+        <Input
+          ref={messageTextRef}
+          border="none"
+          borderRadius="none"
+          _focus={{
+            border: "1px solid black",
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              sendMessage(e);
+            }
+          }}
+          type="text"
+          placeholder="Type your message…"
+        />
+        <Button
+          bg="black"
+          color="white"
+          borderRadius="none"
+          _hover={{
+            bg: "white",
+            color: "black",
+            border: "1px solid black",
+          }}
+          onClick={sendMessage}
+        >
+          Send
+        </Button>
+      </Flex>
     </>
   );
 };
