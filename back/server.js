@@ -25,6 +25,7 @@ io.on("connection", (socket) => {
             socket.join(data.roomID);
             socket.emit("joined", data.roomID);
             console.log("another user joined the room")
+            
         } else {
             socket.emit("full", data.roomID)
             console.log("the room is full")

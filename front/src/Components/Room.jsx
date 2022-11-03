@@ -3,6 +3,7 @@ import VideoChatUI from "./VideoChatUI";
 import { Grid, GridItem } from "@chakra-ui/react";
 
 const Room = () => {
+
   return (
     <>
       <Grid
@@ -10,7 +11,7 @@ const Room = () => {
                         "videoChat textChat"
                     `}
         gridTemplateRows={"1fr"}
-        gridTemplateColumns={"2/3fr 1fr"}
+        gridTemplateColumns={"1f 1frr"}
         h="100vh"
         gap="1"
         color="blackAlpha.700"

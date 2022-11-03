@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import socket from "../Socket/";
 import { useNavigate, useParams } from "react-router-dom";
-import { Grid, GridItem, AspectRatio, Center } from "@chakra-ui/react";
+import { Grid, GridItem, AspectRatio } from "@chakra-ui/react";
+import ACTIONS from "../Socket/actions.mjs";
 
 const VideoChatUI = () => {
   const localVideoRef = useRef();
@@ -30,7 +31,7 @@ const VideoChatUI = () => {
 
   const onIceCandidate = (event) => {
     if (event.candidate) {
-      console.log(`sending an ICE candidate ${event.candidate}`);
+      console.log(`sending an ICE candidate ${JSON.stringify(event.candidate)}`);
       socket.emit("candidate", {
         type: "candidate",
         label: event.candidate.sdpMLineIndex,
@@ -42,6 +43,8 @@ const VideoChatUI = () => {
   };
 
   useEffect(() => async () => {
+    socket.emit(ACTIONS.JOIN, { roomID: roomID });
+    
     socket.on("created", async () => {
       console.log(`Event created was triggered`);
       try {
@@ -141,7 +144,8 @@ const VideoChatUI = () => {
     <>
       <Grid
         templateAreas={`"localVideoOutput"
-                        "romoteVideoOutput"`}
+                        "romoteVideoOutput"
+        `}
         gridTemplateRows={"1fr 1fr"}
         gridTemplateColumns={"1fr"}
         h="100%"
@@ -149,7 +153,7 @@ const VideoChatUI = () => {
         color="blackAlpha.700"
         fontWeight="bold"
       >
-        <GridItem pl="2" area={"localVideoOutput"}>
+        <GridItem mt={3} pl="2" area={"localVideoOutput"}>
           <AspectRatio ratio={16 / 9}>
             <video ref={localVideoRef} autoPlay playsInline></video>
           </AspectRatio>
