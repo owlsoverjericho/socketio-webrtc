@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import ACTIONS from "../front/src/Socket/actions.mjs";
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3003;
 
 const HTTPserver = createServer();
 
