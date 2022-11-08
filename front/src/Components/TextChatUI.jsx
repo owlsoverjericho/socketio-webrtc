@@ -11,7 +11,6 @@ const TextChatUI = () => {
   const localMsgRef = useRef(null);
   const remoteMsgRef = useRef(null);
 
-
   const sendMessage = (e) => {
     e.preventDefault();
     if (messageTextRef.current.value !== "") {

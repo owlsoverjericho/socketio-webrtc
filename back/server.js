@@ -62,4 +62,4 @@ io.on("connection", (socket) => {
      })
 })
 
-HTTPserver.listen(PORT, console.log(`HTTP server is running on port ${PORT} 🚀`));
+HTTPserver.listen(PORT, () => console.log(`HTTP server is running on port ${PORT} 🚀`));
