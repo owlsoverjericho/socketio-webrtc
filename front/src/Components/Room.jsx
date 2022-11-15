@@ -20,7 +20,7 @@ const Room = () => {
       >
         <GridItem pl="2" bg="#1d2635" area={"header"}>
           <Center>
-            <Text mt="4">Chat Room</Text>
+            <Text  mt="4">Chat Room</Text>
           </Center>
         </GridItem>
         <GridItem pl="2" bg="black.300" area={"videoChat"}>
