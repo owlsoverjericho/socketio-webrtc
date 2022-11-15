@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import socket from "../Socket";
 import { Button, Input, Flex, Text, Avatar } from "@chakra-ui/react";
-import sendIcon from "../icons/sendIcon.svg"
+import sendIcon from "../icons/sendIcon.svg";
 
 const TextChatUI = () => {
   const [messages, setMessages] = useState([]);
@@ -26,8 +26,8 @@ const TextChatUI = () => {
     const myID = socket.id;
     if (myID === data.userID) {
       return (
-        <>
-          <Flex key={index} w="100%" justify="flex-end">
+        <div key={index}>
+          <Flex w="100%" justify="flex-end">
             <Flex
               bg="blue"
               color="white"
@@ -44,12 +44,12 @@ const TextChatUI = () => {
           ></Avatar>
           </Flex>
           <div ref={localMsgRef} />
-        </>
+        </div>
       );
     }
     return (
-      <>
-        <Flex key={index} w="100%">
+      <div key={index}>
+        <Flex w="100%">
           <Avatar
             name="remoteUser"
             bg="blue.300"
@@ -66,7 +66,7 @@ const TextChatUI = () => {
           </Flex>
         </Flex>
         <div ref={remoteMsgRef} />
-      </>
+      </div>
     );
   });
 
@@ -81,12 +81,13 @@ const TextChatUI = () => {
 
   socket.on("chat-message", (data) => {
     setMessages([...messages, data]);
+    console.log(data)
   });
 
   return (
     <>
       <Flex w="100%" h="95.1%" overflowY="scroll" flexDirection="column" p="3" borderLeft="1px solid black">
-          <ul >{messageList}</ul>
+          {messageList}
       </Flex>
 
       <Flex w="100%" borderLeft="1px solid black" borderTop="1px solid black" borderRight="1px solid black">
