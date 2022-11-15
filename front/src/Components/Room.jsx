@@ -1,13 +1,14 @@
 import TextChatUI from "../Components/TextChatUI";
 import VideoChatUI from "./VideoChatUI";
-import { Grid, GridItem } from "@chakra-ui/react";
+import { Grid, GridItem, Center, Text } from "@chakra-ui/react";
+import socket from "../Socket";
 
 const Room = () => {
-
   return (
     <>
       <Grid
-        templateAreas={`"videoChat textChat"
+        templateAreas={`"header header"
+                        "videoChat textChat"
                         "videoChat textChat"
                     `}
         gridTemplateRows={"1fr"}
@@ -17,6 +18,11 @@ const Room = () => {
         color="blackAlpha.700"
         fontWeight="bold"
       >
+        <GridItem pl="2" bg="#1d2635" area={"header"}>
+          <Center>
+            <Text mt="4">Chat Room</Text>
+          </Center>
+        </GridItem>
         <GridItem pl="2" bg="black.300" area={"videoChat"}>
           <VideoChatUI />
         </GridItem>

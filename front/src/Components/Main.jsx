@@ -17,39 +17,37 @@ const Main = () => {
         h="calc(100vh)"
         gap="1"
         color="blackAlpha.700"
+        bg='tomato'
         fontWeight="bold"
       >
-        
         <GridItem pl="2" bg="gray.300" area={"page-top"}>
           Page top
         </GridItem>
-        
+
         <Center>
-        <GridItem pl="2" area={"create-room"}>
+          <GridItem pl="2" area={"create-room"}>
             <Button onClick={() => navigate(`/room/${v4()}`)}>
               Create a room
             </Button>
+          </GridItem>
+        </Center>
 
-        </GridItem>
-        </Center>
-        
         <Center>
-        <GridItem pl="2" area={"join-room"}>
-          <Flex>
-            <Input
-              ref={roomInputRef}
-              type="text"
-              placeholder="enter a room number here"
-            />
-            <Button
-              onClick={() => navigate(`/room/${roomInputRef.current.value}`)}
-            >
-              Join a room
-            </Button>
-          </Flex>
-        </GridItem>
+          <GridItem pl="2" area={"join-room"}>
+            <Flex>
+              <Input
+                ref={roomInputRef}
+                type="text"
+                placeholder="enter a room number here"
+              />
+              <Button
+                onClick={() => navigate(`/room/${roomInputRef.current.value}`)}
+              >
+                Join a room
+              </Button>
+            </Flex>
+          </GridItem>
         </Center>
-      
       </Grid>
     </>
   );

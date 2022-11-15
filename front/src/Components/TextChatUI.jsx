@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import socket from "../Socket";
-import { Button, Input, Flex, Text, Avatar } from "@chakra-ui/react";
+import { Button, Input, Flex, Text, Avatar, Center } from "@chakra-ui/react";
 import sendIcon from "../icons/sendIcon.svg";
 
 const TextChatUI = () => {
@@ -38,10 +38,7 @@ const TextChatUI = () => {
             >
               <Text>{data.message}</Text>
             </Flex>
-            <Avatar
-            name="localUser"
-            bg="blue.300"
-          ></Avatar>
+            <Avatar name="localUser" bg="blue.300"></Avatar>
           </Flex>
           <div ref={localMsgRef} />
         </div>
@@ -50,10 +47,7 @@ const TextChatUI = () => {
     return (
       <div key={index}>
         <Flex w="100%">
-          <Avatar
-            name="remoteUser"
-            bg="blue.300"
-          ></Avatar>
+          <Avatar name="remoteUser" bg="blue.300"></Avatar>
           <Flex
             bg="gray.100"
             color="black"
@@ -72,27 +66,41 @@ const TextChatUI = () => {
 
   useEffect(
     () => async () => {
-      localMsgRef.current?.scrollIntoView({behavior: 'smooth'});
-      remoteMsgRef.current?.scrollIntoView({behavior: 'smooth'});
+      localMsgRef.current?.scrollIntoView({ behavior: "smooth" });
+      remoteMsgRef.current?.scrollIntoView({ behavior: "smooth" });
     },
     [messages, roomID]
   );
 
-
-  socket.on("chat-message", (data) => {
+  socket.once("chat-message", (data) => {
     setMessages([...messages, data]);
-    console.log(data)
+    console.log(data);
   });
 
   return (
     <>
-      <Flex w="100%" h="95.1%" overflowY="scroll" flexDirection="column" p="3" borderLeft="1px solid black">
-          {messageList}
+      <Flex
+        w="100%"
+        h="95.1%"
+        overflowY="scroll"
+        flexDirection="column"
+        p="3"
+        borderLeft="1px solid black"
+        >
+        <Center>
+          <Text>Room ID: {roomID}</Text>
+        </Center>
+        {messageList}
       </Flex>
 
-      <Flex w="100%" borderLeft="1px solid black" borderTop="1px solid black" borderRight="1px solid black">
+      <Flex
+        w="100%"
+        borderLeft="1px solid black"
+        borderTop="1px solid black"
+        borderRight="1px solid black"
+      >
         <Input
-        border="none"
+          border="none"
           ref={messageTextRef}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -102,13 +110,8 @@ const TextChatUI = () => {
           type="text"
           placeholder="Type your message…"
         />
-        <Button
-          bg="white"
-          color="black"
-          border="none"
-          onClick={sendMessage}
-        >
-          <img src={sendIcon} alt="send"/>
+        <Button bg="white" color="black" border="none" onClick={sendMessage}>
+          <img src={sendIcon} alt="send" />
         </Button>
       </Flex>
     </>

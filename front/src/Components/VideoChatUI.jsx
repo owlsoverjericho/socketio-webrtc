@@ -31,7 +31,9 @@ const VideoChatUI = () => {
 
   const onIceCandidate = (event) => {
     if (event.candidate) {
-      console.log(`sending an ICE candidate ${JSON.stringify(event.candidate)}`);
+      console.log(
+        `sending an ICE candidate ${JSON.stringify(event.candidate)}`
+      );
       socket.emit("candidate", {
         type: "candidate",
         label: event.candidate.sdpMLineIndex,
@@ -42,96 +44,96 @@ const VideoChatUI = () => {
     }
   };
 
+  const getLocalStream = async () => {
+    try {
+      stream.current = await navigator.mediaDevices.getUserMedia(mediaConfig);
+      localVideoRef.current.srcObject = stream.current;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getPeerConnection = async () => {
+    try {
+      peerConnection.current = new RTCPeerConnection(networkConfig);
+      peerConnection.current.onicecandidate = onIceCandidate;
+      peerConnection.current.ontrack = onAddStream;
+      stream.current.getTracks().forEach((track) => {
+        peerConnection.current.addTrack(track, stream.current);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const generateOffer = async () => {
+    offer.current = await peerConnection.current.createOffer();
+    peerConnection.current.setLocalDescription(offer.current);
+    socket.emit("offer", {
+      type: "offer",
+      sdp: offer.current,
+      roomID: roomID,
+    });
+  };
+
+  const generateAnswer = async (event) => {
+    peerConnection.current.setRemoteDescription(
+      new RTCSessionDescription(event)
+    );
+    answer.current = await peerConnection.current.createAnswer();
+    peerConnection.current.setLocalDescription(answer.current);
+    socket.emit("answer", {
+      type: "answer",
+      sdp: answer.current,
+      roomID: roomID,
+    });
+  };
+
   useEffect(() => async () => {
     socket.emit(ACTIONS.JOIN, { roomID: roomID });
-    
+
     socket.on("created", async () => {
       console.log(`Event created was triggered`);
-      try {
-        stream.current = await navigator.mediaDevices.getUserMedia(mediaConfig);
-        localVideoRef.current.srcObject = stream.current;
-        isCaller.current = true;
-      } catch (error) {
-        console.error(error);
-      }
+      await getLocalStream();
+      isCaller.current = true;
     });
 
     socket.on("joined", async () => {
       console.log(`Event joined was triggered`);
-      try {
-        stream.current = await navigator.mediaDevices.getUserMedia(mediaConfig);
-        localVideoRef.current.srcObject = stream.current;
-        socket.emit("ready", { roomID: roomID });
-      } catch (error) {
-        console.error(error);
-      }
+      await getLocalStream();
+      socket.emit("ready", { roomID: roomID });
     });
 
     socket.on("ready", async () => {
       console.log(`Event ready was triggered`);
       if (isCaller.current) {
-        try {
-          peerConnection.current = new RTCPeerConnection(networkConfig);
-          peerConnection.current.onicecandidate = onIceCandidate;
-          peerConnection.current.ontrack = onAddStream;
-          stream.current.getTracks().forEach((track) => {
-            peerConnection.current.addTrack(track, stream.current);
-          });
-
-          offer.current = await peerConnection.current.createOffer();
-          peerConnection.current.setLocalDescription(offer.current);
-          socket.emit("offer", {
-            type: "offer",
-            sdp: offer.current,
-            roomID: roomID,
-          });
-        } catch (error) {
-          console.error(error);
-        }
+        await getPeerConnection();
+        await generateOffer();
       }
     });
 
     socket.on("offer", async (event) => {
       console.log(`Event offer was triggered`);
       if (!isCaller.current) {
-        try {
-          peerConnection.current = new RTCPeerConnection(networkConfig);
-          peerConnection.current.onicecandidate = onIceCandidate;
-          peerConnection.current.ontrack = onAddStream;
-          stream.current.getTracks().forEach((track) => {
-            peerConnection.current.addTrack(track, stream.current);
-          });
-
-          peerConnection.current.setRemoteDescription(
-            new RTCSessionDescription(event)
-          );
-          answer.current = await peerConnection.current.createAnswer();
-          peerConnection.current.setLocalDescription(answer.current);
-          socket.emit("answer", {
-            type: "answer",
-            sdp: answer.current,
-            roomID: roomID,
-          });
-        } catch (error) {
-          console.error(error);
-        }
+        await getPeerConnection();
+        await generateAnswer(event);
       }
     });
 
-    socket.on("answer", (event) => {
+    socket.on("answer", async (event) => {
       console.log(`Event answer was triggered`);
-      peerConnection.current.setRemoteDescription(
+      await peerConnection.current.setRemoteDescription(
         new RTCSessionDescription(event)
       );
     });
 
-    socket.on("candidate", (event) => {
+    socket.on("candidate", async (event) => {
       console.log(`Event candidate was triggered`);
       const candidate = new RTCIceCandidate({
         sdpMLineIndex: event.label,
         candidate: event.candidate,
       });
-      peerConnection.current.addIceCandidate(candidate);
+      await peerConnection.current.addIceCandidate(candidate);
     });
 
     socket.on("full", () => {

@@ -47,7 +47,8 @@ io.on("connection", (socket) => {
         console.log(`CONNECTION ERROR: ${e}`);
     });
     socket.on("chat-message", (data) => {
-        io.to(data.roomID).emit("chat-message", { message: data.message, userID: socket.id });
+        io.in(data.roomID).emit("chat-message", { message: data.message, userID: socket.id });
     });
+    console.log(socket.rooms);
 });
 HTTPserver.listen(PORT, () => console.log(`HTTP server is running on port ${PORT} 🚀`));
