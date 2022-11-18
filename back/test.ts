@@ -11,4 +11,3 @@ console.log("Some changes were made!")
 const foo: number = 5;
 
 console.log(foo);
-
