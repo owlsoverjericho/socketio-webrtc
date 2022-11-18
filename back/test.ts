@@ -5,3 +5,6 @@ const showType = <T>(arg: T) => {
 }
 
 showType(5);
+
+console.log("Some changes were made!")
+
