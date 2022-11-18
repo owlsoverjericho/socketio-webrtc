@@ -29,7 +29,7 @@ const TextChatUI = () => {
         <div key={index}>
           <Flex w="100%" justify="flex-end">
             <Flex
-              bg="blue"
+              bg="#4040a1"
               color="white"
               minW="100px"
               maxW="350px"
@@ -47,7 +47,7 @@ const TextChatUI = () => {
     return (
       <div key={index}>
         <Flex w="100%">
-          <Avatar name="remoteUser" bg="blue.300"></Avatar>
+          <Avatar name="remoteUser" bg="#fefbd8"></Avatar>
           <Flex
             bg="gray.100"
             color="black"
@@ -74,21 +74,20 @@ const TextChatUI = () => {
 
   socket.once("chat-message", (data) => {
     setMessages([...messages, data]);
-    console.log(data);
   });
 
   return (
     <>
       <Flex
         w="100%"
-        h="95.1%"
+        h="90vh"
         overflowY="scroll"
         flexDirection="column"
         p="3"
         borderLeft="1px solid black"
         >
         <Center>
-          <Text>Room ID: {roomID}</Text>
+          <Text color={"#eeeeee"}>Room ID: {roomID}</Text>
         </Center>
         {messageList}
       </Flex>
@@ -100,7 +99,7 @@ const TextChatUI = () => {
         borderRight="1px solid black"
       >
         <Input
-          border="none"
+        bg="white"
           ref={messageTextRef}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -110,7 +109,7 @@ const TextChatUI = () => {
           type="text"
           placeholder="Type your message…"
         />
-        <Button bg="white" color="black" border="none" onClick={sendMessage}>
+        <Button bg="white" color="black" onClick={sendMessage}>
           <img src={sendIcon} alt="send" />
         </Button>
       </Flex>

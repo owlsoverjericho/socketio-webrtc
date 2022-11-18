@@ -1,7 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { v4 } from "uuid";
 import { useRef } from "react";
-import { Grid, GridItem, Button, Input, Center, Flex } from "@chakra-ui/react";
+import {
+  Grid,
+  GridItem,
+  Button,
+  Input,
+  Center,
+  Flex,
+  Text
+} from "@chakra-ui/react";
+import socket from "../Socket"
 
 const Main = () => {
   const navigate = useNavigate();
@@ -15,32 +24,30 @@ const Main = () => {
         gridTemplateRows={"1fr 12fr"}
         gridTemplateColumns={"1fr 1fr"}
         h="calc(100vh)"
-        gap="1"
-        color="blackAlpha.700"
-        bg='tomato'
+        bg="#667292"
         fontWeight="bold"
       >
-        <GridItem pl="2" bg="gray.300" area={"page-top"}>
-          Page top
+        <GridItem bg="#36486b" area={"page-top"}>
+          <Center mt={5}><Text fontSize='6xl'>App Name TBD</Text></Center>
         </GridItem>
 
         <Center>
           <GridItem pl="2" area={"create-room"}>
-            <Button onClick={() => navigate(`/room/${v4()}`)}>
+            <Button m={1} onClick={() => navigate(`/room/${v4()}`)}>
               Create a room
             </Button>
           </GridItem>
         </Center>
 
         <Center>
-          <GridItem pl="2" area={"join-room"}>
+          <GridItem area={"join-room"}>
             <Flex>
-              <Input
+              <Input m={1}
                 ref={roomInputRef}
                 type="text"
                 placeholder="enter a room number here"
               />
-              <Button
+              <Button m={1}
                 onClick={() => navigate(`/room/${roomInputRef.current.value}`)}
               >
                 Join a room

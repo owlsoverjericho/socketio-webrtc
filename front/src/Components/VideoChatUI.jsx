@@ -151,16 +151,15 @@ const VideoChatUI = () => {
         gridTemplateRows={"1fr 1fr"}
         gridTemplateColumns={"1fr"}
         h="100%"
-        gap="1"
         color="blackAlpha.700"
         fontWeight="bold"
       >
-        <GridItem mt={3} pl="2" area={"localVideoOutput"}>
+        <GridItem m={1} area={"localVideoOutput"}>
           <AspectRatio ratio={16 / 9}>
             <video ref={localVideoRef} autoPlay playsInline></video>
           </AspectRatio>
         </GridItem>
-        <GridItem pl="2" area={"romoteVideoOutput"}>
+        <GridItem m={1} area={"romoteVideoOutput"}>
           <AspectRatio ratio={16 / 9}>
             <video ref={remoteVideoRef} autoPlay playsInline></video>
           </AspectRatio>

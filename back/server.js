@@ -12,7 +12,20 @@ const io = new Server(HTTPserver, {
     },
     transports: ["websocket"],
 });
+
+const getRooms = () => {
+    const {rooms} = io.sockets.adapter;
+    return Array.from(rooms.keys())
+}
+
+const shareRooms = () => {
+    io.emit("share-rooms", {
+        rooms: getRooms(),
+    })
+}
+
 io.on("connection", (socket) => {
+    shareRooms();
     socket.on(ACTIONS.JOIN, (data) => {
         const myRoom = io.sockets.adapter.rooms.get(data.roomID) || { size: 0 };
         if (myRoom.size === 0) {
