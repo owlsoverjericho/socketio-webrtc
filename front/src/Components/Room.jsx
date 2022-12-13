@@ -21,7 +21,7 @@ const Room = () => {
       >
         <GridItem bg="#1d2635" area={"header"}>
           <Center>
-            <Link onClick={() => navigate("/")} color={"#eeeeee"} mt="4">
+            <Link onClick={() => navigate("/")}>
               Chat Room
             </Link>
           </Center>
