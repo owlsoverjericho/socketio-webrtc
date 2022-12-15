@@ -7,7 +7,7 @@ const VideoChatUI = () => {
   const localVideoRef = useRef<HTMLVideoElement>();
   const remoteVideoRef = useRef<HTMLVideoElement>();
   const isCaller = useRef(false);
-  const peerConnection = useRef();
+  const peerConnection = useRef<RTCPeerConnection>();
   const { roomID } = useParams();
   const networkConfig = {
     iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
@@ -16,8 +16,8 @@ const VideoChatUI = () => {
     video: true,
     audio: false,
   };
-  const stream = useRef();
-  const remoteStream = useRef();
+  const stream = useRef<MediaStream>();
+  const remoteStream = useRef<MediaStream>();
   const offer = useRef();
   const answer = useRef();
 
@@ -28,7 +28,7 @@ const VideoChatUI = () => {
     remoteStream.current = event.streams[0];
   };
 
-  const onIceCandidate = (event) => {
+  const onIceCandidate = (event: RTCIceCandidate) => {
     if (event.candidate) {
       console.log(
         `sending an ICE candidate ${JSON.stringify(event.candidate)}`
@@ -46,7 +46,7 @@ const VideoChatUI = () => {
   const getLocalStream = async () => {
     try {
       stream.current = await navigator.mediaDevices.getUserMedia(mediaConfig);
-      localVideoRef.current.srcObject = stream.current;
+      if (localVideoRef.current !== undefined) localVideoRef.current.srcObject = stream.current;
     } catch (error) {
       console.error(error);
     }
@@ -57,9 +57,11 @@ const VideoChatUI = () => {
       peerConnection.current = new RTCPeerConnection(networkConfig);
       peerConnection.current.onicecandidate = onIceCandidate;
       peerConnection.current.ontrack = onAddStream;
-      stream.current.getTracks().forEach((track) => {
-        peerConnection.current.addTrack(track, stream.current);
-      });
+      if (stream.current !== undefined) {
+        stream.current.getTracks().forEach((track) => {
+          peerConnection.current.addTrack(track, stream.current);
+        });
+      }
     } catch (error) {
       console.error(error);
     }
@@ -75,17 +77,19 @@ const VideoChatUI = () => {
     });
   };
 
-  const generateAnswer = async (event) => {
-    peerConnection.current.setRemoteDescription(
-      new RTCSessionDescription(event)
-    );
-    answer.current = await peerConnection.current.createAnswer();
-    peerConnection.current.setLocalDescription(answer.current);
-    socket.emit("answer", {
-      type: "answer",
-      sdp: answer.current,
-      roomID: roomID,
-    });
+  const generateAnswer = async (event: RTCSessionDescription) => {
+    if (peerConnection.current !== undefined) {
+      peerConnection.current.setRemoteDescription(
+        new RTCSessionDescription(event)
+        );
+        answer.current = await peerConnection.current.createAnswer();
+        peerConnection.current.setLocalDescription(answer.current);
+        socket.emit("answer", {
+          type: "answer",
+          sdp: answer.current,
+          roomID: roomID,
+        });
+    }
   };
 
   useEffect(() => async () => {
@@ -121,9 +125,11 @@ const VideoChatUI = () => {
 
     socket.on("answer", async (event) => {
       console.log(`Event answer was triggered`);
-      await peerConnection.current.setRemoteDescription(
-        new RTCSessionDescription(event)
-      );
+      if (peerConnection.current !== undefined) {
+        await peerConnection.current.setRemoteDescription(
+          new RTCSessionDescription(event)
+        );
+      }
     });
 
     socket.on("candidate", async (event) => {
@@ -132,7 +138,9 @@ const VideoChatUI = () => {
         sdpMLineIndex: event.label,
         candidate: event.candidate,
       });
-      await peerConnection.current.addIceCandidate(candidate);
+      if (peerConnection.current !== undefined) {
+        await peerConnection.current.addIceCandidate(candidate);
+      }
     });
 
     socket.on("full", () => {

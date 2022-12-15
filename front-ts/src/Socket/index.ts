@@ -32,9 +32,9 @@ interface ServerToClientEvents {
   "chat-message": (data: { message: string; userID: string }) => void;
   created: () => void;
   joined: () => void;
-  offer: (event) => void;
-  answer: (event) => void;
-  candidate: (event) => void;
+  offer: (event: RTCSessionDescription) => void;
+  answer: (event: RTCSessionDescription) => void;
+  candidate: (event: RTCIceCandidate) => void;
   full: () => void;
   ready: () => void;
 }
