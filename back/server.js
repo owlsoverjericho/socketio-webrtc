@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3003;
 const HTTPserver = createServer();
 const io = new Server(HTTPserver, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "https://glittering-zuccutto-7b9e3d.netlify.app/",
     },
     transports: ["websocket"],
 });
