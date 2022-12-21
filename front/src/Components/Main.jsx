@@ -4,7 +4,7 @@ import { useRef } from "react";
 
 const Main = () => {
   const navigate = useNavigate();
-  const roomInputRef = useRef<HTMLInputElement>(null);
+  const roomInputRef = useRef();
 
   const uuidValidator =
     /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;

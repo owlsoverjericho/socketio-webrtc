@@ -3,19 +3,14 @@ import { useParams } from "react-router-dom";
 import socket from "../Socket";
 import sendIcon from "../assets/sendIcon.svg";
 
-interface Message {
-  message: string;
-  userID: string;
-}
-
 const TextChatUI = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const messageTextRef = useRef<HTMLInputElement>(null);
+  const [messages, setMessages] = useState([]);
+  const messageTextRef = useRef(null);
   const { roomID } = useParams();
-  const localMsgRef = useRef<HTMLDivElement>(null);
-  const remoteMsgRef = useRef<HTMLDivElement>(null);
+  const localMsgRef = useRef(null);
+  const remoteMsgRef = useRef(null);
 
-  const sendMessage = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const sendMessage = (event) => {
     event.preventDefault();
     if (messageTextRef.current !== null && messageTextRef.current.value !== "") {
       socket.emit("chat-message", {

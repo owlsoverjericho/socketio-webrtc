@@ -1,13 +1,12 @@
 import { useEffect, useRef } from "react";
 import socket from "../Socket";
 import { useNavigate, useParams } from "react-router-dom";
-import ACTIONS from "../Socket/actions.mjs";
 
 const VideoChatUI = () => {
-  const localVideoRef = useRef<HTMLVideoElement>();
-  const remoteVideoRef = useRef<HTMLVideoElement>();
+  const localVideoRef = useRef();
+  const remoteVideoRef = useRef();
   const isCaller = useRef(false);
-  const peerConnection = useRef<RTCPeerConnection>();
+  const peerConnection = useRef();
   const { roomID } = useParams();
   const networkConfig = {
     iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
@@ -16,8 +15,8 @@ const VideoChatUI = () => {
     video: true,
     audio: false,
   };
-  const stream = useRef<MediaStream>();
-  const remoteStream = useRef<MediaStream>();
+  const stream = useRef();
+  const remoteStream = useRef();
   const offer = useRef();
   const answer = useRef();
 
@@ -28,7 +27,7 @@ const VideoChatUI = () => {
     remoteStream.current = event.streams[0];
   };
 
-  const onIceCandidate = (event: RTCIceCandidate) => {
+  const onIceCandidate = (event) => {
     if (event.candidate) {
       console.log(
         `sending an ICE candidate ${JSON.stringify(event.candidate)}`
@@ -77,7 +76,7 @@ const VideoChatUI = () => {
     });
   };
 
-  const generateAnswer = async (event: RTCSessionDescription) => {
+  const generateAnswer = async (event) => {
     if (peerConnection.current !== undefined) {
       peerConnection.current.setRemoteDescription(
         new RTCSessionDescription(event)
