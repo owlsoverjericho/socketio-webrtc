@@ -13,8 +13,8 @@ const HTTPserver = createServer((req, res) => {
     "Access-Control-Max-Age": 2592000, // 30 days
     /** add other headers as per requirement */
   });
-  response.write(JSON.stringify({ message: "ok" }));
-  return response.end();
+  res.write(JSON.stringify({ message: "ok" }));
+  return res.end();
 });
 const io = new Server(HTTPserver, {
   cors: {
