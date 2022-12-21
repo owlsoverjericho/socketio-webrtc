@@ -91,9 +91,10 @@ const VideoChatUI = () => {
         });
     }
   };
-
+  
+  
   useEffect(() => async () => {
-    socket.emit(ACTIONS.JOIN, { roomID: roomID });
+    socket.emit("connected", { roomID: roomID });
 
     socket.on("created", async () => {
       console.log(`Event created was triggered`);

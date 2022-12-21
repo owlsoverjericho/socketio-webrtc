@@ -26,7 +26,7 @@ const shareRooms = () => {
 
 io.on("connection", (socket) => {
     shareRooms();
-    socket.on(ACTIONS.JOIN, (data) => {
+    socket.on("connected", (data) => {
         const myRoom = io.sockets.adapter.rooms.get(data.roomID) || { size: 0 };
         if (myRoom.size === 0) {
             socket.join(data.roomID);
