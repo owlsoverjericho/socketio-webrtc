@@ -8,7 +8,7 @@ const options = {
 };
 
 const socket = io(
-  "http://localhost:3002",
+  "https://back-g7cq.onrender.com/",
   options
 );
 
