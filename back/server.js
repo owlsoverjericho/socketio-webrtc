@@ -5,7 +5,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 const PORT = process.env.PORT || 3003;
 const HTTPserver = createServer((req, res) => {
-  response.writeHead(200, {
+    res.writeHead(200, {
     "content-type": "application/json",
     "Access-Control-Allow-Origin": "*" /* @dev First, read about security */,
     "Access-Control-Allow-Methods": "OPTIONS, POST, GET, PUT, DELETE",
