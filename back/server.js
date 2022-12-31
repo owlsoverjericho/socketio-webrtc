@@ -1,11 +1,13 @@
 import { createServer } from "node:http";
 import { Server } from "socket.io";
+import ACTIONS from "../front/src/Socket/actions.js";
 import * as dotenv from "dotenv";
+import { version, validate } from "uuid";
 
 dotenv.config();
 const PORT = process.env.PORT || 3003;
 const HTTPserver = createServer((req, res) => {
-    res.writeHead(200, {
+  res.writeHead(200, {
     "content-type": "application/json",
     "Access-Control-Allow-Origin": "*" /* @dev First, read about security */,
     "Access-Control-Allow-Methods": "OPTIONS, POST, GET, PUT, DELETE",
@@ -25,18 +27,69 @@ const io = new Server(HTTPserver, {
 
 const getRooms = () => {
   const { rooms } = io.sockets.adapter;
-  return Array.from(rooms.keys());
+  return Array.from(rooms.keys()).filter(roomID => validate(roomID) && version(roomID));
 };
 
 const shareRooms = () => {
-  io.emit("share-rooms", {
+  io.emit(ACTIONS.SHARE_ROOMS, {
     rooms: getRooms(),
   });
 };
 
 io.on("connection", (socket) => {
   shareRooms();
-  socket.on("connected", (data) => {
+
+  socket.on(ACTIONS.JOIN, (config) => {
+    const { room: roomID } = config;
+    const { rooms: joinedRooms } = socket; //check rooms where this socket has already joined
+
+    if (Array.from(joinedRooms).includes(roomID)) {
+      //check if we are currently in this room
+      return console.warn(`Already joined to ${roomID}`);
+    }
+
+    const clients = [] || Array.from(io.sockets.adapter.rooms.get(roomID));
+    clients.forEach((clientID) => {
+      io.to(clientID).emit(ACTIONS.ADD_PEER, {
+        peerID: socket.id,
+        createOffer: false,
+      });
+
+      socket.emit(ACTIONS.ADD_PEER, {
+        peerID: clientID,
+        createOffer: true,
+      });
+    });
+   socket.join(roomID);
+   shareRooms(); 
+  });
+
+  const leaveRoom = () => {
+    const {rooms} = socket;
+    Array.from(rooms).forEach((roomID) => {
+      const clients = Array.from(io.sockets.adapter.rooms.get(roomID)) || [];
+
+      clients.forEach(clientID => {
+        io.to(clientID).emit(ACTIONS.REMOVE_PEER, {
+          peerID: socket.id,
+        });
+
+        socket.emit(ACTIONS.REMOVE_PEER, {
+          peerID: clientID,
+        });
+      });
+      socket.leave(roomID);
+    });
+    shareRooms();
+  };
+
+  socket.on(ACTIONS.LEAVE, leaveRoom);
+  socket.on("disconnecting", leaveRoom);
+   
+  
+  
+  
+  /*   socket.on("connected", (data) => {
     const myRoom = io.sockets.adapter.rooms.get(data.roomID) || { size: 0 };
     if (myRoom.size === 0) {
       socket.join(data.roomID);
@@ -63,10 +116,12 @@ io.on("connection", (socket) => {
   });
   socket.on("answer", (event) => {
     socket.broadcast.to(event.roomID).emit("answer", event.sdp);
-  });
-  socket.on("connect_failed", (e) => {
-    console.log(`CONNECTION ERROR: ${e}`);
-  });
+  }); */
+
+    socket.on("connect_failed", (e) => {
+      console.log(`CONNECTION ERROR: ${e}`);
+    });
+
   socket.on("chat-message", (data) => {
     io.in(data.roomID).emit("chat-message", {
       message: data.message,
