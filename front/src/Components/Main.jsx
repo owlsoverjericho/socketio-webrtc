@@ -7,10 +7,14 @@ import ACTIONS from "../Socket/actions";
 const Main = () => {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState([]);
+  const [roomStatus, setRoomStatus] = useState()
 
   useEffect(() => {
     socket.on(ACTIONS.SHARE_ROOMS, ({rooms} = {}) => {
       setRooms(rooms);
+    })
+    socket.on("full", data => {
+      console.log(data)
     })
   }, []);
 

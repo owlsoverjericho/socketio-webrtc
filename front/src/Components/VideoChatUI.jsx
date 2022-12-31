@@ -1,6 +1,7 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import useWebRTC, {LOCAL_VIDEO} from "../hooks/useWebRTC";
+import socket from "../Socket/";
+import ACTIONS from "../Socket/actions";
 
 const VideoChatUI = () => {
   const localVideoRef = useRef();
@@ -22,10 +23,21 @@ const VideoChatUI = () => {
 
   const navigate = useNavigate();
 
- const { clients, provideMediaRef } = useWebRTC(roomID);
- console.log(`clients after import ${clients}`)
 
-/*   const onAddStream = (event) => {
+  const getLocalStream = async () => {
+    try {
+      stream.current = await navigator.mediaDevices.getUserMedia(mediaConfig);
+      if (localVideoRef.current !== undefined) {
+        localVideoRef.current.srcObject = stream.current;
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  const onAddStream = (event) => {
     remoteVideoRef.current.srcObject = event.streams[0];
     remoteStream.current = event.streams[0];
   };
@@ -45,14 +57,7 @@ const VideoChatUI = () => {
     }
   };
 
-  const getLocalStream = async () => {
-    try {
-      stream.current = await navigator.mediaDevices.getUserMedia(mediaConfig);
-      if (localVideoRef.current !== undefined) localVideoRef.current.srcObject = stream.current;
-    } catch (error) {
-      console.error(error);
-    }
-  };
+
 
   const getPeerConnection = async () => {
     try {
@@ -93,87 +98,70 @@ const VideoChatUI = () => {
         });
     }
   };
-  
-  const clearMediaStream = () => {
-    try {
-      stream.current.getTracks().forEach((track) => {
-        track.stop();
-        console.log(`clearing`)
-      });
-      localVideoRef.current.srcObject = null;
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
-  
-  socket.on("created", async () => {
-    console.log(`Event created was triggered`);
-    await getLocalStream();
-    isCaller.current = true;
-  });
-
-  socket.on("joined", async () => {
-    console.log(`Event joined was triggered`);
-    await getLocalStream();
-    socket.emit("ready", { roomID: roomID });
-  });
-
-  socket.on("ready", async () => {
-    console.log(`Event ready was triggered`);
-    if (isCaller.current) {
-      await getPeerConnection();
-      await generateOffer();
-    }
-  });
-
-  socket.on("offer", async (event) => {
-    console.log(`Event offer was triggered`);
-    if (!isCaller.current) {
-      await getPeerConnection();
-      await generateAnswer(event);
-    }
-  });
-
-  socket.on("answer", async (event) => {
-    console.log(`Event answer was triggered`);
-    if (peerConnection.current !== undefined) {
-      await peerConnection.current.setRemoteDescription(
-        new RTCSessionDescription(event)
-      );
-    }
-  });
-
-  socket.on("candidate", async (event) => {
-    console.log(`Event candidate was triggered`);
-    const candidate = new RTCIceCandidate({
-      sdpMLineIndex: event.label,
-      candidate: event.candidate,
+ useEffect(() => {
+   
+   socket.emit("connected", { roomID: roomID }); 
+    socket.on("created", async () => {
+      console.log(`Event created was triggered`);
+      await getLocalStream();
+      isCaller.current = true;
     });
-    if (peerConnection.current !== undefined) {
-      await peerConnection.current.addIceCandidate(candidate);
-    }
-  });
-
-  socket.on("full", () => {
-    console.log("full room");
-    navigate("/");
-  });
   
-  socket.emit("connected", { roomID: roomID }); */
+    socket.on("joined", async () => {
+      console.log(`Event joined was triggered`);
+      await getLocalStream();
+      socket.emit("ready", { roomID: roomID });
+    });
+  
+    socket.on("ready", async () => {
+      console.log(`Event ready was triggered`);
+      if (isCaller.current) {
+        await getPeerConnection();
+        await generateOffer();
+      }
+    });
+  
+    socket.on("offer", async (event) => {
+      console.log(`Event offer was triggered`);
+      if (!isCaller.current) {
+        await getPeerConnection();
+        await generateAnswer(event);
+      }
+    });
+  
+    socket.on("answer", async (event) => {
+      console.log(`Event answer was triggered`);
+      if (peerConnection.current !== undefined) {
+        await peerConnection.current.setRemoteDescription(
+          new RTCSessionDescription(event)
+        );
+      }
+    });
+  
+    socket.on("candidate", async (event) => {
+      console.log(`Event candidate was triggered`);
+      const candidate = new RTCIceCandidate({
+        sdpMLineIndex: event.label,
+        candidate: event.candidate,
+      });
+      if (peerConnection.current !== undefined) {
+        await peerConnection.current.addIceCandidate(candidate);
+      }
+    });
+  
+    socket.on("full", () => {
+      console.log("full room");
+      navigate("/");
+    });
+    
+    socket.emit(ACTIONS.JOIN, { roomID: roomID });
+
+  }, [roomID])
 
   return (
     <div className="flex flex-col w-full">
-      {/* <video className="aspect-square w-64 h-64" ref={localVideoRef} autoPlay playsInline></video>
-      <video className="aspect-video" ref={remoteVideoRef} autoPlay playsInline></video> */}
-      {clients.map(clientID => {
-        return (
-          <div key={clientID}>
-            <video ref={instance => {
-              provideMediaRef(clientID, instance);
-            }} autoPlay playsInline muted={clientID === LOCAL_VIDEO}/>
-          </div>
-        )
-      })}
+      <video className="aspect-square w-64 h-64" ref={localVideoRef} autoPlay playsInline></video>
+      <video className="aspect-video" ref={remoteVideoRef} autoPlay playsInline></video>
     </div>
   );
 };

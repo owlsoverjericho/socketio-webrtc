@@ -27,7 +27,9 @@ const io = new Server(HTTPserver, {
 
 const getRooms = () => {
   const { rooms } = io.sockets.adapter;
-  return Array.from(rooms.keys()).filter(roomID => validate(roomID) && version(roomID));
+  return Array.from(rooms.keys()).filter(
+    (roomID) => validate(roomID) && version(roomID)
+  );
 };
 
 const shareRooms = () => {
@@ -39,7 +41,7 @@ const shareRooms = () => {
 io.on("connection", (socket) => {
   shareRooms();
 
-  socket.on(ACTIONS.JOIN, (config) => {
+/*   socket.on(ACTIONS.JOIN, (config) => {
     const { room: roomID } = config;
     const { rooms: joinedRooms } = socket; //check rooms where this socket has already joined
 
@@ -60,16 +62,16 @@ io.on("connection", (socket) => {
         createOffer: true,
       });
     });
-   socket.join(roomID);
-   shareRooms(); 
-  });
+    socket.join(roomID);
+    shareRooms();
+  }); */
 
   const leaveRoom = () => {
-    const {rooms} = socket;
+    const { rooms } = socket;
     Array.from(rooms).forEach((roomID) => {
       const clients = Array.from(io.sockets.adapter.rooms.get(roomID)) || [];
 
-      clients.forEach(clientID => {
+      clients.forEach((clientID) => {
         io.to(clientID).emit(ACTIONS.REMOVE_PEER, {
           peerID: socket.id,
         });
@@ -85,13 +87,17 @@ io.on("connection", (socket) => {
 
   socket.on(ACTIONS.LEAVE, leaveRoom);
   socket.on("disconnecting", leaveRoom);
-   
-  
-  
-  
-  /*   socket.on("connected", (data) => {
+
+  socket.on(ACTIONS.JOIN, (data) => {
     const myRoom = io.sockets.adapter.rooms.get(data.roomID) || { size: 0 };
-    if (myRoom.size === 0) {
+    const { rooms: joinedRooms } = socket; //check rooms where this socket has already joined
+    if (Array.from(joinedRooms).includes(data.roomID)) {
+      //check if we are currently in this room
+      socket.emit("created", data.roomID);
+      return console.warn(`Already joined to ${data.roomID}`);
+    }
+
+     else if (myRoom.size === 0) {
       socket.join(data.roomID);
       socket.emit("created", data.roomID);
       console.log("room created");
@@ -102,9 +108,11 @@ io.on("connection", (socket) => {
     } else {
       socket.emit("full", data.roomID);
       console.log("the room is full");
-    }
+      shareRooms();
+    } 
     console.log(io.sockets.adapter.rooms.get(data.roomID));
   });
+  
   socket.on("ready", (data) => {
     socket.broadcast.to(data.roomID).emit("ready");
   });
@@ -116,11 +124,11 @@ io.on("connection", (socket) => {
   });
   socket.on("answer", (event) => {
     socket.broadcast.to(event.roomID).emit("answer", event.sdp);
-  }); */
+  });
 
-    socket.on("connect_failed", (e) => {
-      console.log(`CONNECTION ERROR: ${e}`);
-    });
+  socket.on("connect_failed", (e) => {
+    console.log(`CONNECTION ERROR: ${e}`);
+  });
 
   socket.on("chat-message", (data) => {
     io.in(data.roomID).emit("chat-message", {
