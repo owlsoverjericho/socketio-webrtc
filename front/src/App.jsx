@@ -20,6 +20,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Main />} />
       <Route path="room/:roomID" element={<Room />} />
+      <Route path="*" element={<NotFound404 />} />
     </Routes>
   </BrowserRouter>
 }

@@ -38,6 +38,7 @@ const VideoChatUI = () => {
 
 
   const onAddStream = (event) => {
+    console.log("onAddStream");
     remoteVideoRef.current.srcObject = event.streams[0];
     remoteStream.current = event.streams[0];
   };
@@ -98,6 +99,7 @@ const VideoChatUI = () => {
         });
     }
   };
+  
  useEffect(() => {
    
    socket.emit("connected", { roomID: roomID }); 
