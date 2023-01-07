@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import socket from "../Socket/";
 import ACTIONS from "../Socket/actions";
@@ -16,7 +16,7 @@ const VideoChatUI = () => {
     video: true,
     audio: false,
   };
-  const stream = useRef();
+  const stream = useRef(null);
   const remoteStream = useRef();
   const offer = useRef();
   const answer = useRef();
@@ -27,7 +27,7 @@ const VideoChatUI = () => {
   const getLocalStream = async () => {
     try {
       stream.current = await navigator.mediaDevices.getUserMedia(mediaConfig);
-      if (localVideoRef.current !== undefined) {
+      if (localVideoRef.current !== null) {
         localVideoRef.current.srcObject = stream.current;
       }
 

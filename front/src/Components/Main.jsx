@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { v4 } from "uuid";
+import { v4, validate } from "uuid";
 import { useState, useEffect } from "react";
 import socket from "../Socket";
 import ACTIONS from "../Socket/actions";
@@ -7,7 +7,6 @@ import ACTIONS from "../Socket/actions";
 const Main = () => {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState([]);
-  const [roomStatus, setRoomStatus] = useState()
 
   useEffect(() => {
     socket.on(ACTIONS.SHARE_ROOMS, ({rooms} = {}) => {
