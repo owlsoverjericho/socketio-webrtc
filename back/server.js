@@ -15,7 +15,7 @@ const HTTPserver = createServer((req, res) => {
     "Access-Control-Max-Age": 2592000, // 30 days
     /** add other headers as per requirement */
   });
-  res.write(JSON.stringify({ message: "ok" }));
+  res.write(JSON.stringify({ message: "the server is up and running" }));
   return res.end();
 });
 const io = new Server(HTTPserver, {
